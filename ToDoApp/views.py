@@ -13,14 +13,17 @@ tasks = []
 
 
 def index(request):
+    temp_tasks = request.session.get('temp_tasks', [])
+
     if request.method == 'POST':
         task_name = request.POST.get('taskInput')
-        task_status = request.POST.get('taskStatus', 'Pending')  # Default to 'Pending'
-        Task.objects.create(name=task_name, status=task_status)
+        task_status = request.POST.get('taskStatus', 'Pending')
+        new_task = {'name': task_name, 'status': task_status}
+        temp_tasks.append(new_task)  # Default to 'Pending'
+        request.session['temp_tasks'] = temp_tasks
         return redirect('home')  # Adjust the redirect as needed
 
-    tasks = Task.objects.all()
-    return render(request, 'index.html', {'tasks': tasks})
+    return render(request, 'index.html', {'tasks': temp_tasks, 'user_authenticated': False})
 
 @csrf_exempt
 def update_task(request, task_id):
@@ -98,7 +101,7 @@ def update_task(request, task_id):
         new_status = request.POST.get('status')
         task.status = new_status
         task.save()
-        return redirect('home')  # Redirect to your task list or home page
+        return redirect('todo_list')  # Redirect to your task list or home page
 
     return render(request, 'update_task.html', {'task': task})
 
@@ -108,7 +111,7 @@ def delete_task(request, task_id):
 
     if request.method == 'POST':
         task.delete()
-        return redirect('home')  # Redirect to your task list or home page
+        return redirect('todo_list')  # Redirect to your task list or home page
 
     return render(request, 'delete_task.html', {'task': task})
 

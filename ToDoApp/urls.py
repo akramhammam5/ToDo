@@ -8,6 +8,7 @@ urlpatterns = [
     path('todo/', todo_list, name='todo_list'),  
     path('logout/', logout_view, name='logout'),
     path('tasks/', task_list, name='task_list'),
-    path('update-task/', update_task, name='update_task'),
+    path('update-task/<int:task_id>', update_task, name='update_task'),
     path('delete-task/<int:task_id>/', delete_task, name='delete_task'),
+
 ]
