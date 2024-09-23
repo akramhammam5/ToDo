@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .field {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: #007bff;
+        }
+        label {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            color: #999;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        input:focus + label,
+        input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #007bff;
+        }
+        .field input[type="submit"] {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .field input[type="submit"]:hover {
+            background: #0056b3;
+        }
+        .signup-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">Sign Up</div>
+        <form method="POST" action="{% url 'signup' %}">
+            {% csrf_token %}
+            <div class="field">
+                <input type="text" name="full_name" required>
+                <label>Full Name</label>
+            </div>
+            <div class="field">
+                <input type="email" name="email" required>
+                <label>Email Address</label>
+            </div>
+            <div class="field">
+                <input type="password" name="password" required>
+                <label>Password</label>
+            </div>
+            <div class="field">
+                <input type="password" name="confirm" required>
+                <label>Confirm Password</label>
+            </div>
+            <div class="field">
+                <input type="submit" value="Sign Up">
+            </div>
+            <div class="signup-link">
+                Already a member? <a href="{% url 'login' %}">Login now</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

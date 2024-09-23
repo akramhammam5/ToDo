@@ -1,0 +1,226 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>ToDo List App</title>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+            font-family: Arial, sans-serif;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .light-mode {
+            background-color: #ffffff;
+            color: black;
+        }
+        .card {
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .card.dark-mode {
+            background-color: #1e1e1e;
+            color: white;
+            box-shadow: 0 2px 10px rgba(116, 106, 106, 0.5);
+        }
+        .top-right-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .centered-form {
+            max-width: 400px;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        .btn {
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 20px;
+        }
+        .form-control {
+            border-radius: 20px;
+            border: 1px solid #ced4da;
+        }
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .card-header.dark-mode {
+            background-color: #2c2c2c;
+        }
+        .list-group-item {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .list-group-item.light-mode {
+            background-color: #ffffff;
+            color: black;
+        }
+        .list-group-item.dark-mode {
+            background-color: #2c2c2c;
+            color: white;
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="container mt-5">
+        <div class="top-right-buttons">
+            <a href="{% url 'login' %}"><button class="btn btn-primary mr-2">Login</button></a>
+            <a href="{% url 'signup' %}"><button class="btn btn-secondary">Sign Up</button></a>
+        </div>
+
+        <div class="d-flex justify-content-center mt-5">
+            <button id="toggleButton" class="btn btn-dark">Switch to Dark Mode</button>
+        </div>
+
+        <div class="card centered-form light-mode">
+            <div class="card-header text-center">
+                <h2>ToDo List</h2>
+            </div>
+            <div class="card-body">
+                <form id="taskForm" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="taskInput" placeholder="Enter a new task" required>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" name="taskStatus" required>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Add Task</button>
+                </form>
+            </div>
+            <ul id="taskList" class="list-group list-group-flush">
+                {% for task in tasks %}
+                    <li class="list-group-item light-mode d-flex justify-content-between align-items-center">
+                        <span>{{ task.name }} ({{ task.status }})</span>
+                        <div>
+                            <button class="btn btn-warning btn-sm" onclick="updateTaskStatus('{{ task.id }}', 'In Progress')">In Progress</button><br>
+                            <button class="btn btn-success btn-sm" onclick="updateTaskStatus('{{ task.id }}', 'Completed')">Completed</button><br>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTask('{{ task.id }}')">Delete</button>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item light-mode">No tasks added yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+    </div>
+
+
+    
+
+    <script>
+
+function setDarkMode(isDark) {
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            document.body.classList.remove('light-mode');
+            document.getElementById('toggleButton').textContent = "Switch to Light Mode";
+            document.getElementById('toggleButton').classList.remove('btn-dark');
+            document.getElementById('toggleButton').classList.add('btn-light');
+            document.querySelector('.card').classList.add('dark-mode');
+            document.querySelector('.card-header').classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.body.classList.add('light-mode');
+            document.getElementById('toggleButton').textContent = "Switch to Dark Mode";
+            document.getElementById('toggleButton').classList.remove('btn-light');
+            document.getElementById('toggleButton').classList.add('btn-dark');
+            document.querySelector('.card').classList.remove('dark-mode');
+            document.querySelector('.card-header').classList.remove('dark-mode');
+        }
+    }
+
+    // Check local storage for dark mode preference
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'true') {
+        setDarkMode(true);
+    }
+
+    
+        // Dark/Light mode toggle functionality
+        const toggleButton = document.getElementById('toggleButton');
+        const taskListItems = document.querySelectorAll('.list-group-item');
+
+        toggleButton.addEventListener('click', function () {
+        const isDark = document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('darkMode', isDark); // Save preference
+        setDarkMode(isDark);
+    
+
+            if (document.body.classList.contains('dark-mode')) {
+                toggleButton.textContent = "Switch to Light Mode";
+                toggleButton.classList.remove('btn-dark');
+                toggleButton.classList.add('btn-light');
+                card.classList.add('dark-mode');
+                cardHeader.classList.add('dark-mode');
+                taskListItems.forEach(item => {
+                    item.classList.remove('light-mode');
+                    item.classList.add('dark-mode');
+                });
+            } else {
+                toggleButton.textContent = "Switch to Dark Mode";
+                toggleButton.classList.remove('btn-light');
+                toggleButton.classList.add('btn-dark');
+                card.classList.remove('dark-mode');
+                cardHeader.classList.remove('dark-mode');
+                taskListItems.forEach(item => {
+                    item.classList.remove('dark-mode');
+                    item.classList.add('light-mode');
+                });
+            }
+        });
+
+        function updateTaskStatus(taskId, newStatus) {
+    fetch(`/update-task/${taskId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}' // Make sure you have CSRF token in the template context
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload(); // Reload to get updated tasks
+        }
+    });
+}
+
+function deleteTask(taskId) {
+    fetch(`/delete-task/${taskId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload(); // Reload to get updated tasks
+        }
+    });
+}
+
+    </script>
+</body>
+</html>

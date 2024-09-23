@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Login</title>
+      <link rel="stylesheet" href="{% static 'css/register.css' %}">
+   </head>
+   <body>
+      <div class="wrapper">
+         <div class="title">
+            Login
+         </div>
+         <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="field">
+                <input type="text" name="email" required>
+                <label>Email Address</label>
+            </div>
+            <div class="field">
+                <input type="password" name="password" required>
+                <label>Password</label>
+            </div>
+            <div class="field">
+                <input type="submit" value="Login">
+            </div>
+            <div class="signup-link">
+                Not a member? <a href="{% url 'signup' %}">Signup now</a>
+            </div>
+        </form>
+      </div>
+   </body>
+</html>
